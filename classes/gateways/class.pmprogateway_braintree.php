@@ -3,16 +3,16 @@
 	require_once(dirname(__FILE__) . "/class.pmprogateway.php");
 	
 	//load classes init method
-	add_action('init', array('PMProGateway_braintree', 'init'));
+	add_action('init', array('PMProGateway_braintree', 'init'));	
 	
-	if(!class_exists("Braintree"))
-		require_once(dirname(__FILE__) . "/../../includes/lib/Braintree/Braintree.php");
 	class PMProGateway_braintree extends PMProGateway
 	{
 		function PMProGateway_braintree($gateway = NULL)
-		{
+		{			
 			$this->gateway = $gateway;
 			$this->gateway_environment = pmpro_getOption("gateway_environment");
+			
+			$this->loadBraintreeLibrary();		
 			
 			//convert to braintree nomenclature
 			$environment = $this->gateway_environment;
@@ -28,9 +28,22 @@
 		}										
 		
 		/**
+		 * Load the Braintree API library.
+		 *		
+		 * @since 1.8.1
+		 * Moved into a method in version 1.8.1 so we only load it when needed.
+		 */
+		function loadBraintreeLibrary()
+		{
+			//load Braintree library if it hasn't been loaded already (usually by another plugin using Braintree)
+			if(!class_exists("Braintree"))
+				require_once(dirname(__FILE__) . "/../../includes/lib/Braintree/Braintree.php");
+		}		
+		
+		/**
 		 * Run on WP init
 		 *		 
-		 * @since 2.0
+		 * @since 1.8
 		 */
 		static function init()
 		{			
@@ -55,7 +68,7 @@
 		/**
 		 * Make sure this gateway is in the gateways list
 		 *		 
-		 * @since 2.0
+		 * @since 1.8
 		 */
 		static function pmpro_gateways($gateways)
 		{
@@ -68,7 +81,7 @@
 		/**
 		 * Get a list of payment options that the this gateway needs/supports.
 		 *		 
-		 * @since 2.0
+		 * @since 1.8
 		 */
 		static function getGatewayOptions()
 		{			
@@ -93,7 +106,7 @@
 		/**
 		 * Set payment options for payment settings page.
 		 *		 
-		 * @since 2.0
+		 * @since 1.8
 		 */
 		static function pmpro_payment_options($options)
 		{			
@@ -109,7 +122,7 @@
 		/**
 		 * Display fields for this gateway's options.
 		 *		 
-		 * @since 2.0
+		 * @since 1.8
 		 */
 		static function pmpro_payment_option_fields($values, $gateway)
 		{
@@ -171,7 +184,7 @@
 		/**
 		 * Filtering orders at checkout.
 		 *		 
-		 * @since 2.0
+		 * @since 1.8
 		 */
 		static function pmpro_checkout_order($morder)
 		{			
@@ -250,7 +263,7 @@
 		
 		/**
 		 * Use our own payment fields at checkout. (Remove the name attributes and set some data-encrypted-name attributes.)
-		 * @since 2.0
+		 * @since 1.8
 		 */
 		static function pmpro_include_payment_information_fields($include)
 		{			
